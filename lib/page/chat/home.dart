@@ -77,14 +77,14 @@ class _HomePageState extends State<HomePage> {
     ModelIndicatorInfo(
       modelId: "gpt-3.5-turbo",
       modelName: 'GPT-3.5',
-      description: '速度快，成本低',
+      description: 'GPT-3.5',
       icon: Icons.bolt,
       activeColor: Colors.green,
     ),
     ModelIndicatorInfo(
       modelId: "gpt-4",
       modelName: 'GPT-4',
-      description: '能力强，更精准',
+      description: 'GPT-4',
       icon: Icons.auto_awesome,
       activeColor: const Color.fromARGB(255, 120, 73, 223),
     ),

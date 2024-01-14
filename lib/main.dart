@@ -378,28 +378,7 @@ class MyApp extends StatefulWidget {
                 const DrawboardScreen(),
               ),
             ),
-            GoRoute(
-              name: 'characters',
-              path: '/',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) => transitionResolver(
-                MultiBlocProvider(
-                  providers: [BlocProvider.value(value: chatRoomBloc)],
-                  child: RoomsPage(setting: settingRepo),
-                ),
-              ),
-            ),
-            GoRoute(
-              name: 'create-room',
-              path: '/create-room',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) => transitionResolver(
-                MultiBlocProvider(
-                  providers: [BlocProvider.value(value: chatRoomBloc)],
-                  child: RoomCreatePage(setting: settingRepo),
-                ),
-              ),
-            ),
+
             GoRoute(
               name: 'chat',
               path: '/room/:room_id/chat',
