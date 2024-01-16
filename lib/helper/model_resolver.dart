@@ -4,7 +4,6 @@ import 'package:askaide/helper/constant.dart';
 import 'package:askaide/helper/error.dart';
 import 'package:askaide/helper/helper.dart';
 import 'package:askaide/repo/api_server.dart';
-import 'package:askaide/repo/deepai_repo.dart';
 import 'package:askaide/repo/model/chat_message.dart';
 import 'package:askaide/repo/model/message.dart';
 import 'package:askaide/repo/model/room.dart';
@@ -15,17 +14,14 @@ import 'package:dart_openai/openai.dart';
 /// 根据聊天类型，调用不同的 API 接口
 class ModelResolver {
   late final OpenAIRepository openAIRepo;
-  late final DeepAIRepository deepAIRepo;
   late final StabilityAIRepository stabilityAIRepo;
 
   /// 初始化，设置模型实现
   void init({
     required OpenAIRepository openAIRepo,
-    required DeepAIRepository deepAIRepo,
     required StabilityAIRepository stabilityAIRepo,
   }) {
     this.openAIRepo = openAIRepo;
-    this.deepAIRepo = deepAIRepo;
     this.stabilityAIRepo = stabilityAIRepo;
   }
 
@@ -134,15 +130,7 @@ class ModelResolver {
     required List<Message> contextMessages,
     required Function(String value) onMessage,
   }) async {
-    if (deepAIRepo.selfHosted) {
-      var res = await deepAIRepo.painting(room.modelName(), message.text);
-      onMessage('\n![${res.id}](${res.url})\n');
-    } else {
-      var taskId =
-          await deepAIRepo.paintingAsync(room.modelName(), message.text);
-      await Future.delayed(const Duration(seconds: 10));
-      await _waitForTasks(taskId, onMessage);
-    }
+
   }
 
   /// 调用 OpenAI API

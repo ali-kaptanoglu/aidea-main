@@ -18,8 +18,6 @@ import 'package:askaide/helper/model_resolver.dart';
 import 'package:askaide/helper/platform.dart';
 import 'package:askaide/lang/lang.dart';
 import 'package:askaide/data/migrate.dart';
-import 'package:askaide/page/balance/quota_usage_details.dart';
-import 'package:askaide/page/creative_island/draw/artistic_text.dart';
 import 'package:askaide/page/setting/account_security.dart';
 import 'package:askaide/page/app_scaffold.dart';
 import 'package:askaide/page/lab/avatar_selector.dart';
@@ -33,30 +31,20 @@ import 'package:askaide/page/chat/home_chat_history.dart';
 import 'package:askaide/page/chat/room_create.dart';
 import 'package:askaide/page/component/random_avatar.dart';
 import 'package:askaide/page/component/transition_resolver.dart';
-import 'package:askaide/page/creative_island/my_creation.dart';
-import 'package:askaide/page/creative_island/my_creation_item.dart';
+
 import 'package:askaide/page/setting/custom_home_models.dart';
-import 'package:askaide/page/balance/free_statistics.dart';
 import 'package:askaide/page/chat/group/chat.dart';
 import 'package:askaide/page/chat/group/create.dart';
 import 'package:askaide/page/chat/group/edit.dart';
 import 'package:askaide/page/lab/creative_models.dart';
 import 'package:askaide/page/setting/destroy_account.dart';
 import 'package:askaide/page/setting/diagnosis.dart';
-import 'package:askaide/page/creative_island/draw/draw_list.dart';
-import 'package:askaide/page/creative_island/draw/draw_create.dart';
-import 'package:askaide/page/creative_island/draw/image_edit_direct.dart';
-import 'package:askaide/page/lab/draw_board.dart';
-import 'package:askaide/page/creative_island/gallery/gallery.dart';
-import 'package:askaide/page/creative_island/gallery/gallery_item.dart';
+
 import 'package:askaide/page/setting/notification.dart';
 import 'package:askaide/page/setting/openai_setting.dart';
-import 'package:askaide/page/balance/payment.dart';
 import 'package:askaide/page/lab/prompt.dart';
-import 'package:askaide/page/balance/quota_usage_statistics.dart';
 
 import 'package:askaide/page/component/chat/message_state_manager.dart';
-import 'package:askaide/page/balance/payment_history.dart';
 import 'package:askaide/page/setting/retrieve_password_screen.dart';
 import 'package:askaide/page/lab/user_center.dart';
 import 'package:askaide/page/setting/user_api_keys.dart';
@@ -67,7 +55,6 @@ import 'package:askaide/repo/creative_island_repo.dart';
 import 'package:askaide/repo/data/cache_data.dart';
 import 'package:askaide/repo/data/chat_history.dart';
 import 'package:askaide/repo/data/creative_island_data.dart';
-import 'package:askaide/repo/deepai_repo.dart';
 import 'package:askaide/repo/stabilityai_repo.dart';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:askaide/helper/constant.dart';
@@ -156,7 +143,6 @@ void main() async {
   // 创建数据仓库
   final settingRepo = SettingRepository(settingProvider);
   final openAIRepo = OpenAIRepository(settingProvider);
-  final deepAIRepo = DeepAIRepository(settingProvider);
   final stabilityAIRepo = StabilityAIRepository(settingProvider);
   final cacheRepo = CacheRepository(CacheDataProvider(db));
 
@@ -175,7 +161,6 @@ void main() async {
   // 初始化聊天实现解析器
   ModelResolver.instance.init(
     openAIRepo: openAIRepo,
-    deepAIRepo: deepAIRepo,
     stabilityAIRepo: stabilityAIRepo,
   );
 
@@ -371,13 +356,7 @@ class MyApp extends StatefulWidget {
                 const AvatarSelectorScreen(usage: AvatarUsage.room),
               ),
             ),
-            GoRoute(
-              path: '/lab/draw-board',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) => transitionResolver(
-                const DrawboardScreen(),
-              ),
-            ),
+
 
             GoRoute(
               name: 'chat',
@@ -491,168 +470,14 @@ class MyApp extends StatefulWidget {
                 ),
               ),
             ),
-            GoRoute(
-              name: 'creative-draw',
-              path: '/creative-draw',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) => transitionResolver(
-                MultiBlocProvider(
-                  providers: [
-                    BlocProvider(
-                        create: (context) =>
-                            CreativeIslandBloc(creativeIslandRepo)),
-                  ],
-                  child: DrawListScreen(
-                    setting: settingRepo,
-                  ),
-                ),
-              ),
-            ),
-            GoRoute(
-              name: 'creative-upscale',
-              path: '/creative-draw/create-upscale',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) => transitionResolver(
-                MultiBlocProvider(
-                  providers: [
-                    BlocProvider(
-                        create: (context) =>
-                            CreativeIslandBloc(creativeIslandRepo)),
-                  ],
-                  child: ImageEditDirectScreen(
-                    setting: settingRepo,
-                    title: AppLocale.superResolution.getString(context),
-                    apiEndpoint: 'upscale',
-                    note: state.queryParameters['note'],
-                    initWaitDuration: 15,
-                    initImage: state.queryParameters['init_image'],
-                  ),
-                ),
-              ),
-            ),
-            GoRoute(
-              name: 'creative-colorize',
-              path: '/creative-draw/create-colorize',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) => transitionResolver(
-                MultiBlocProvider(
-                  providers: [
-                    BlocProvider(
-                        create: (context) =>
-                            CreativeIslandBloc(creativeIslandRepo)),
-                  ],
-                  child: ImageEditDirectScreen(
-                    setting: settingRepo,
-                    title: AppLocale.colorizeImage.getString(context),
-                    apiEndpoint: 'colorize',
-                    note: state.queryParameters['note'],
-                    initWaitDuration: 15,
-                    initImage: state.queryParameters['init_image'],
-                  ),
-                ),
-              ),
-            ),
-            GoRoute(
-              name: 'creative-video',
-              path: '/creative-draw/create-video',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) => transitionResolver(
-                MultiBlocProvider(
-                  providers: [
-                    BlocProvider(
-                        create: (context) =>
-                            CreativeIslandBloc(creativeIslandRepo)),
-                  ],
-                  child: ImageEditDirectScreen(
-                    setting: settingRepo,
-                    title: '图生视频',
-                    apiEndpoint: 'image-to-video',
-                    note: state.queryParameters['note'],
-                    initWaitDuration: 60,
-                    initImage: state.queryParameters['init_image'],
-                  ),
-                ),
-              ),
-            ),
-            GoRoute(
-              name: 'creative-draw-gallery-preview',
-              path: '/creative-draw/gallery/:id',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) => transitionResolver(
-                MultiBlocProvider(
-                  providers: [
-                    BlocProvider.value(value: galleryBloc),
-                  ],
-                  child: GalleryItemScreen(
-                    setting: settingRepo,
-                    galleryId: int.parse(state.pathParameters['id']!),
-                  ),
-                ),
-              ),
-            ),
-            GoRoute(
-              name: 'creative-draw-create',
-              path: '/creative-draw/create',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) => transitionResolver(
-                MultiBlocProvider(
-                  providers: [
-                    BlocProvider.value(value: galleryBloc),
-                  ],
-                  child: DrawCreateScreen(
-                    setting: settingRepo,
-                    galleryCopyId: int.tryParse(
-                      state.queryParameters['gallery_copy_id'] ?? '',
-                    ),
-                    mode: state.queryParameters['mode']!,
-                    id: state.queryParameters['id']!,
-                    note: state.queryParameters['note'],
-                    initImage: state.queryParameters['init_image'],
-                  ),
-                ),
-              ),
-            ),
-            GoRoute(
-              name: 'creative-artistic-text',
-              path: '/creative-draw/artistic-text',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) => transitionResolver(
-                MultiBlocProvider(
-                  providers: [
-                    BlocProvider.value(value: galleryBloc),
-                  ],
-                  child: ArtisticTextScreen(
-                    setting: settingRepo,
-                    galleryCopyId: int.tryParse(
-                      state.queryParameters['gallery_copy_id'] ?? '',
-                    ),
-                    type: state.queryParameters['type']!,
-                    id: state.queryParameters['id']!,
-                    note: state.queryParameters['note'],
-                  ),
-                ),
-              ),
-            ),
-            GoRoute(
-              name: 'creative-island-history-all',
-              path: '/creative-island/history',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) {
-                return transitionResolver(
-                  MultiBlocProvider(
-                    providers: [
-                      BlocProvider(
-                          create: (context) =>
-                              CreativeIslandBloc(creativeIslandRepo)),
-                    ],
-                    child: MyCreationScreen(
-                      setting: settingRepo,
-                      mode: state.queryParameters['mode'] ?? '',
-                    ),
-                  ),
-                );
-              },
-            ),
+
+
+
+
+
+
+
+
             GoRoute(
               name: 'creative-island-models',
               path: '/creative-island/models',
@@ -670,60 +495,9 @@ class MyApp extends StatefulWidget {
                 );
               },
             ),
-            GoRoute(
-              name: 'creative-island-history-item',
-              path: '/creative-island/:id/history/:item_id',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) {
-                final id = state.pathParameters['id']!;
-                final itemId = int.tryParse(state.pathParameters['item_id']!);
-                final showErrorMessage =
-                    state.queryParameters['show_error'] == 'true';
-                return transitionResolver(
-                  MultiBlocProvider(
-                    providers: [
-                      BlocProvider(
-                          create: (context) =>
-                              CreativeIslandBloc(creativeIslandRepo)),
-                    ],
-                    child: MyCreationItemPage(
-                      setting: settingRepo,
-                      islandId: id,
-                      itemId: itemId!,
-                      showErrorMessage: showErrorMessage,
-                    ),
-                  ),
-                );
-              },
-            ),
-            GoRoute(
-              name: 'quota-details',
-              path: '/quota-details',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) => transitionResolver(
-                PaymentHistoryScreen(setting: settingRepo),
-              ),
-            ),
-            GoRoute(
-              name: 'quota-usage-statistics',
-              path: '/quota-usage-statistics',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) => transitionResolver(
-                QuotaUsageStatisticsScreen(setting: settingRepo),
-              ),
-            ),
-            GoRoute(
-              name: 'quota-usage-daily-details',
-              path: '/quota-usage-daily-details',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) => transitionResolver(
-                QuotaUsageDetailScreen(
-                  setting: settingRepo,
-                  date: state.queryParameters['date'] ??
-                      DateFormat('yyyy-MM-dd').format(DateTime.now()),
-                ),
-              ),
-            ),
+
+
+
             GoRoute(
               name: 'prompt-editor',
               path: '/prompt-editor',
@@ -733,21 +507,7 @@ class MyApp extends StatefulWidget {
                 return transitionResolver(PromptScreen(prompt: prompt));
               },
             ),
-            GoRoute(
-              name: 'payment',
-              path: '/payment',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) {
-                return transitionResolver(
-                  MultiBlocProvider(
-                    providers: [
-                      BlocProvider(create: ((context) => PaymentBloc())),
-                    ],
-                    child: PaymentScreen(setting: settingRepo),
-                  ),
-                );
-              },
-            ),
+
             GoRoute(
               name: 'bind-phone',
               path: '/bind-phone',
@@ -766,19 +526,7 @@ class MyApp extends StatefulWidget {
                 );
               },
             ),
-            GoRoute(
-              name: 'creative-gallery',
-              path: '/creative-gallery',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) => transitionResolver(
-                MultiBlocProvider(
-                  providers: [
-                    BlocProvider.value(value: galleryBloc),
-                  ],
-                  child: GalleryScreen(setting: settingRepo),
-                ),
-              ),
-            ),
+
             GoRoute(
               name: 'diagnosis',
               path: '/diagnosis',
@@ -787,17 +535,7 @@ class MyApp extends StatefulWidget {
                 DiagnosisScreen(setting: settingRepo),
               ),
             ),
-            GoRoute(
-              name: 'free-statistics',
-              path: '/free-statistics',
-              parentNavigatorKey: _shellNavigatorKey,
-              pageBuilder: (context, state) => transitionResolver(
-                MultiBlocProvider(
-                  providers: [BlocProvider.value(value: freeCountBloc)],
-                  child: FreeStatisticsPage(setting: settingRepo),
-                ),
-              ),
-            ),
+
             GoRoute(
               name: 'custom-home-models',
               path: '/setting/custom-home-models',

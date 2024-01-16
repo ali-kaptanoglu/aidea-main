@@ -10,7 +10,6 @@ import 'package:askaide/page/component/image_preview.dart';
 import 'package:askaide/page/component/loading.dart';
 import 'package:askaide/page/component/share.dart';
 import 'package:askaide/page/component/dialog.dart';
-import 'package:askaide/page/creative_island/gallery/gallery_item.dart';
 import 'package:askaide/page/component/theme/custom_size.dart';
 import 'package:askaide/page/component/theme/custom_theme.dart';
 import 'package:askaide/repo/api_server.dart';
@@ -200,18 +199,7 @@ class _GalleryItemShareScreenState extends State<GalleryItemShareScreen> {
                                     margin: const EdgeInsets.all(0),
                                     borderRadius: 0,
                                     children: [
-                                      if (widget.prompt != null &&
-                                          widget.prompt!.isNotEmpty)
-                                        TextItem(
-                                          title: 'Prompt',
-                                          value: widget.prompt!,
-                                        ),
-                                      if (widget.negativePrompt != null &&
-                                          widget.negativePrompt!.isNotEmpty)
-                                        TextItem(
-                                          title: 'Negative Prompt',
-                                          value: widget.negativePrompt!,
-                                        ),
+
                                     ],
                                   ),
                                   if (showQRCode)
